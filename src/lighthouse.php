@@ -218,6 +218,22 @@ return [
 
     'global_id_field' => 'id',
 
+
+    /*
+    |--------------------------------------------------------------------------
+    | Persisted Queries
+    |--------------------------------------------------------------------------
+    |
+    | TODO: Add meaningful description
+    |
+    */
+
+    'persisted' => [
+        'schema' => base_path('graphql/persisted.json'),
+        'automatic' => false,
+        'driver' => 'database',
+    ],
+
     /*
     |--------------------------------------------------------------------------
     | Batched Queries

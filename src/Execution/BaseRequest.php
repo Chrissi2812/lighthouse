@@ -41,7 +41,19 @@ abstract class BaseRequest implements GraphQLRequest
      */
     public function query(): string
     {
-        return $this->fieldValue('query') ?? '';
+        if ($this->isHashed()) {
+            $query = $this->lookupQuery();
+
+            if (!$query) {
+                if ($this->fieldValue('query')) {
+                    // TODO: implement caching of query if query field is also set
+                } else {
+                    // TODO: implement PersistedQueryNotFound Error
+                }
+            }
+        }
+
+        return $query ?? $this->fieldValue('query') ?? '';
     }
 
     /**
@@ -90,5 +102,11 @@ abstract class BaseRequest implements GraphQLRequest
         }
 
         return $result;
+    }
+
+    public function lookupQuery(): ?string
+    {
+        // TODO: Implement LookUp Method
+        return null;
     }
 }
