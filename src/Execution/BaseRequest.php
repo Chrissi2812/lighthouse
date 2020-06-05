@@ -52,6 +52,16 @@ abstract class BaseRequest implements GraphQLRequest
         return $this->fieldValue('operationName');
     }
 
+    public function isHashed(): bool
+    {
+        return (!empty($this->fieldValue('documentId')) || array_key_exists('sha256Hash', $this->extensions()));
+    }
+
+    public function hash(): ?string
+    {
+        return $this->fieldValue('documentId') ?? $this->extensions()['sha256Hash'];
+    }
+
     /**
      * Is the current query a batched query?
      */

@@ -38,6 +38,20 @@ class LighthouseRequest extends BaseRequest
         return $variables ?? [];
     }
 
+    public function extensions(): array
+    {
+        $extensions = $this->fieldValue('extensions');
+
+        // In case we are resolving a GET request, extensions
+        // are sent as a JSON encoded string
+        if (is_string($extensions)) {
+            return json_decode($extensions, true) ?? [];
+        }
+
+        // If this is a POST request, Laravel already decoded the input for us
+        return $extensions ?? [];
+    }
+
     /**
      * Are there more batched queries to process?
      */

@@ -52,6 +52,11 @@ class MultipartFormRequest extends BaseRequest
         return $this->fieldValue('variables') ?? [];
     }
 
+    public function extensions(): array
+    {
+        return $this->fieldValue('extensions') ?? [];
+    }
+
     protected function fieldValue(string $key)
     {
         return $this->isBatched()

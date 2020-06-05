@@ -27,6 +27,27 @@ interface GraphQLRequest
     public function isBatched(): bool;
 
     /**
+     * Get additional info on the current request
+     *
+     * @return array
+     */
+    public function extensions(): array;
+
+    /**
+     * Is the current query hashed?
+     *
+     * @return bool
+     */
+    public function isHashed(): bool;
+
+    /**
+     * Get hash of the current request
+     *
+     * @return string|null
+     */
+    public function hash(): ?string;
+
+    /**
      * Advance the batch index and indicate if there are more batches to process.
      */
     public function advanceBatchIndex(): bool;
