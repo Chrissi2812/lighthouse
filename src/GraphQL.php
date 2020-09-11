@@ -3,6 +3,7 @@
 namespace Nuwave\Lighthouse;
 
 use GraphQL\Error\Error;
+use GraphQL\Error\InvariantViolation;
 use GraphQL\Executor\ExecutionResult;
 use GraphQL\GraphQL as GraphQLBase;
 use GraphQL\Server\Helper;
@@ -19,6 +20,7 @@ use Nuwave\Lighthouse\Events\ManipulateResult;
 use Nuwave\Lighthouse\Events\StartExecution;
 use Nuwave\Lighthouse\Execution\DataLoader\BatchLoader;
 use Nuwave\Lighthouse\Execution\ErrorPool;
+use Nuwave\Lighthouse\PersistedQueries\LoaderInterface;
 use Nuwave\Lighthouse\Schema\AST\ASTBuilder;
 use Nuwave\Lighthouse\Schema\SchemaBuilder;
 use Nuwave\Lighthouse\Support\Contracts\CreatesContext;
@@ -126,8 +128,12 @@ class GraphQL
      */
     public function executeOperation(OperationParams $params): array
     {
+        $query = $params->queryId
+            ? $this->loadPersistedQuery($params)
+            : $params->query;
+
         $result = $this->executeQuery(
-            $params->query,
+            $query,
             $this->createsContext->generate(
                 app('request')
             ),
@@ -137,6 +143,28 @@ class GraphQL
         );
 
         return $this->applyDebugSettings($result);
+    }
+
+    private function loadPersistedQuery(OperationParams $params): string
+    {
+        $source = $this->getPersistedLoader()($params->queryId, $params);
+
+        if (! is_string($source) ) {
+            throw new InvariantViolation('Persistent query loader must return query string');
+        }
+
+        return $source;
+    }
+
+    private function getPersistedLoader(): LoaderInterface
+    {
+        $loader = config('lighthouse.persisted.loader', null);
+
+        if ($loader === null) {
+            throw new RequestError('Persisted queries are not supported by this server');
+        }
+
+        return new $loader;
     }
 
     /**
